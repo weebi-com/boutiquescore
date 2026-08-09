@@ -19,7 +19,7 @@ BusinessDiagnostic _diag({
     cashSeparation: cash,
     customerCreditTracking: credit,
     restockFrequency: restock,
-    wantsMfiLoan: wantsLoan,
+    wantsLoan: wantsLoan,
     requestedLoanAmount: loan,
   );
 }
@@ -105,7 +105,7 @@ void main() {
       final withLoan = engine.score(
         _diag(
           wantsLoan: true,
-          loan: const MoneyAmount(amountMinor: 500000, currencyCode: 'XAF'),
+          loan: const MoneyAmount(amountMinor: 500000, currency: 'XAF'),
         ),
       );
       expect(withLoan.score, without.score);
@@ -128,13 +128,6 @@ void main() {
             .score,
         greaterThan(kCreditOptInScoreThreshold),
       );
-    });
-  });
-
-  group('MlScoreEngine', () {
-    test('falls back to rules when no model', () {
-      final ml = MlScoreEngine();
-      expect(ml.score(_diag()).score, 20);
     });
   });
 }

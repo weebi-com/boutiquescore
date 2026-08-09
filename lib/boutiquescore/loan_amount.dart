@@ -12,6 +12,6 @@ MoneyAmount? parseLoanAmount({
   if (amount == null || amount <= 0) return null;
   return MoneyAmount(
     amountMinor: amount,
-    currencyCode: requireCurrencyForCountry(countryIso2),
+    currency: requireCurrencyForCountry(countryIso2),
   );
 }

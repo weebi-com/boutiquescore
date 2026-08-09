@@ -323,7 +323,7 @@
       `<option value="${a.key}">${a.label}</option>`
     ).join('');
     legalEl.innerHTML = JSON.parse(boutiquescore.legalFormsJson()).map(f =>
-      `<option value="${f}">${f}</option>`
+      `<option value="${f.code}">${f.label}</option>`
     ).join('');
 
     countryEl.addEventListener('change', refreshCountryDependent);
@@ -392,11 +392,11 @@
         phoneNumber: document.getElementById('phone').value,
         merchantName: '',
         activityKey: activityEl.value,
-        wantsMfiLoan: true,
+        wantsLoan: true,
         requestedLoanAmount: document.getElementById('loanAmount').value,
         isRegistered: registered,
         commercialRegisterNumber: registered ? document.getElementById('rccm').value : '',
-        legalFormCode: registered ? legalEl.value : '',
+        legalForm: registered ? legalEl.value : '',
         campaignId,
         mfiPartnerId,
         honeypot: document.getElementById('website').value,

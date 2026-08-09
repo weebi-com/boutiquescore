@@ -77,7 +77,7 @@ Map<String, Object?> buildSubmitPayload(EvaluationInput input) {
     'cashSeparation': _cashSeparationProto(d.cashSeparation),
     'customerCreditTracking': _customerCreditProto(d.customerCreditTracking),
     'restockFrequency': _restockProto(d.restockFrequency),
-    'wantsMfiLoan': d.wantsMfiLoan,
+    'wantsLoan': d.wantsLoan,
     if (d.requestedLoanAmount != null)
       'requestedLoanAmount': d.requestedLoanAmount!.toJson(),
     if (d.registration != null) 'registration': d.registration!.toJson(),

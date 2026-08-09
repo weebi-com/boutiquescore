@@ -18,14 +18,14 @@ void main() {
           cashSeparation: CashSeparation.fixedSalaryOrLogged,
           customerCreditTracking: CustomerCreditTracking.paperNotebook,
           restockFrequency: RestockFrequency.oneToTwoPerWeek,
-          wantsMfiLoan: true,
+          wantsLoan: true,
           requestedLoanAmount: const MoneyAmount(
             amountMinor: 250000,
-            currencyCode: 'XAF',
+            currency: 'XAF',
           ),
           registration: const RegistrationDetails(
             commercialRegisterNumber: 'RC/DLA/2020/B/123',
-            legalFormCode: LegalFormCode.sarl,
+            legalForm: LegalForm.sarl,
           ),
         ),
         campaignId: 'cameroon_pilot_2026',
@@ -44,9 +44,9 @@ void main() {
       expect(diagnostic['cashSeparation'], 'FIXED_SALARY_OR_LOGGED');
       expect(diagnostic['customerCreditTracking'], 'PAPER_NOTEBOOK');
       expect(diagnostic['restockFrequency'], 'ONE_TO_TWO_PER_WEEK');
-      expect(diagnostic['wantsMfiLoan'], isTrue);
+      expect(diagnostic['wantsLoan'], isTrue);
       expect(
-        (diagnostic['requestedLoanAmount'] as Map)['currencyCode'],
+        (diagnostic['requestedLoanAmount'] as Map)['currency'],
         'XAF',
       );
       expect(
@@ -55,6 +55,10 @@ void main() {
       );
       expect(diagnostic.containsKey('approximateDailyRevenue'), isFalse);
       expect(diagnostic.containsKey('recordMethod'), isFalse);
+      expect(
+        (diagnostic['registration'] as Map)['legalForm'],
+        'SARL',
+      );
     });
   });
 
@@ -70,12 +74,12 @@ void main() {
       final money = parseLoanAmount(countryIso2: 'CM', rawAmount: '250 000');
       expect(money, isNotNull);
       expect(money!.amountMinor, 250000);
-      expect(money.currencyCode, 'XAF');
+      expect(money.currency, 'XAF');
     });
 
     test('GN uses GNF', () {
       final money = parseLoanAmount(countryIso2: 'GN', rawAmount: '1000000');
-      expect(money!.currencyCode, 'GNF');
+      expect(money!.currency, 'GNF');
     });
 
     test('empty returns null', () {

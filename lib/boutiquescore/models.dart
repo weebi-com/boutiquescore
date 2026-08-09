@@ -3,15 +3,15 @@
 class MoneyAmount {
   const MoneyAmount({
     required this.amountMinor,
-    required this.currencyCode,
+    required this.currency,
   });
 
   final int amountMinor;
-  final String currencyCode;
+  final String currency;
 
   Map<String, Object> toJson() => {
         'amountMinor': amountMinor,
-        'currencyCode': currencyCode,
+        'currency': currency,
       };
 }
 
@@ -106,40 +106,87 @@ enum RestockFrequency {
   moreThanTwiceWeekly,
 }
 
-/// Documented legal form codes (OHADA-oriented strings, not a proto enum).
-abstract final class LegalFormCode {
-  static const ei = 'ENTREPRISE_INDIVIDUELLE';
-  static const entreprenant = 'ENTREPRENANT';
-  static const sarl = 'SOCIETE_A_RESPONSABILITE_LIMITEE';
-  static const sa = 'SOCIETE_ANONYME';
-  static const sas = 'SOCIETE_PAR_ACTIONS_SIMPLE';
-  static const gie = 'GROUPEMENT_INDIVIDUEL_D_ENTREPRISE';
-  static const other = 'OTHER';
+/// OHADA legal form — wire acronyms match evaluation_service.LegalForm.
+enum LegalForm {
+  unspecified,
+  ei,
+  entreprenant,
+  sarl,
+  sa,
+  sas,
+  gie,
+  other;
 
-  static const all = <String>[
-    ei,
-    entreprenant,
-    sarl,
-    sa,
-    sas,
-    gie,
-    other,
+  /// Proto / JSON enum name (EI, SARL, …).
+  String get protoName => switch (this) {
+        LegalForm.unspecified => 'LEGAL_FORM_UNSPECIFIED',
+        LegalForm.ei => 'EI',
+        LegalForm.entreprenant => 'ENTREPRENANT',
+        LegalForm.sarl => 'SARL',
+        LegalForm.sa => 'SA',
+        LegalForm.sas => 'SAS',
+        LegalForm.gie => 'GIE',
+        LegalForm.other => 'OTHER',
+      };
+
+  /// Full label for the web UI (not persisted).
+  String get labelFr => switch (this) {
+        LegalForm.unspecified => '',
+        LegalForm.ei => 'Entreprise individuelle',
+        LegalForm.entreprenant => 'Entreprenant',
+        LegalForm.sarl => 'Société à responsabilité limitée',
+        LegalForm.sa => 'Société anonyme',
+        LegalForm.sas => 'Société par actions simplifiée',
+        LegalForm.gie => "Groupement d'intérêt économique",
+        LegalForm.other => 'Autre',
+      };
+
+  static LegalForm fromProto(String? raw) {
+    switch (raw) {
+      case 'EI':
+        return LegalForm.ei;
+      case 'ENTREPRENANT':
+        return LegalForm.entreprenant;
+      case 'SARL':
+        return LegalForm.sarl;
+      case 'SA':
+        return LegalForm.sa;
+      case 'SAS':
+        return LegalForm.sas;
+      case 'GIE':
+        return LegalForm.gie;
+      case 'OTHER':
+        return LegalForm.other;
+      default:
+        return LegalForm.unspecified;
+    }
+  }
+
+  /// Choices shown in the funnel (excludes unspecified).
+  static const selectable = <LegalForm>[
+    LegalForm.ei,
+    LegalForm.entreprenant,
+    LegalForm.sarl,
+    LegalForm.sa,
+    LegalForm.sas,
+    LegalForm.gie,
+    LegalForm.other,
   ];
 }
 
 class RegistrationDetails {
   const RegistrationDetails({
     this.commercialRegisterNumber = '',
-    this.legalFormCode = '',
+    this.legalForm = LegalForm.unspecified,
   });
 
   final String commercialRegisterNumber;
-  final String legalFormCode;
+  final LegalForm legalForm;
 
   Map<String, Object> toJson() => {
         if (commercialRegisterNumber.isNotEmpty)
           'commercialRegisterNumber': commercialRegisterNumber,
-        if (legalFormCode.isNotEmpty) 'legalFormCode': legalFormCode,
+        if (legalForm != LegalForm.unspecified) 'legalForm': legalForm.protoName,
       };
 }
 
@@ -153,7 +200,7 @@ class BusinessDiagnostic {
     required this.cashSeparation,
     required this.customerCreditTracking,
     required this.restockFrequency,
-    required this.wantsMfiLoan,
+    required this.wantsLoan,
     this.requestedLoanAmount,
     this.registration,
     this.clientExtras = const {},
@@ -167,7 +214,7 @@ class BusinessDiagnostic {
   final CashSeparation cashSeparation;
   final CustomerCreditTracking customerCreditTracking;
   final RestockFrequency restockFrequency;
-  final bool wantsMfiLoan;
+  final bool wantsLoan;
   final MoneyAmount? requestedLoanAmount;
   final RegistrationDetails? registration;
   final Map<String, String> clientExtras;

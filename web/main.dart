@@ -37,7 +37,10 @@ class BoutiqueScoreApi {
   }
 
   @JSExport('legalFormsJson')
-  String legalFormsJson() => jsonEncode(LegalFormCode.all);
+  String legalFormsJson() => jsonEncode([
+        for (final f in LegalForm.selectable)
+          {'code': f.protoName, 'label': f.labelFr},
+      ]);
 
   /// Phase A: score from Q1–Q5 only (no phone / PII required).
   @JSExport('scoreOnly')
@@ -107,10 +110,10 @@ class BoutiqueScoreApi {
     final activity = activityKey.isEmpty
         ? null
         : ActivityCatalog.byCompositeKey(activityKey);
-    final wantsLoan = map['wantsMfiLoan'] == true;
+    final wantsLoan = map['wantsLoan'] == true;
     final isRegistered = map['isRegistered'] == true;
     final rccm = map['commercialRegisterNumber'] as String? ?? '';
-    final legalForm = map['legalFormCode'] as String? ?? '';
+    final legalForm = LegalForm.fromProto(map['legalForm'] as String?);
     final loanRaw = map['requestedLoanAmount'] as String? ?? '';
 
     final isic = activity?.isicCode ??
@@ -132,14 +135,14 @@ class BoutiqueScoreApi {
       customerCreditTracking:
           _parseCustomerCredit(map['customerCreditTracking'] as String?),
       restockFrequency: _parseRestock(map['restockFrequency'] as String?),
-      wantsMfiLoan: wantsLoan,
+      wantsLoan: wantsLoan,
       requestedLoanAmount: wantsLoan
           ? parseLoanAmount(countryIso2: countryIso2, rawAmount: loanRaw)
           : null,
       registration: isRegistered
           ? RegistrationDetails(
               commercialRegisterNumber: rccm,
-              legalFormCode: legalForm,
+              legalForm: legalForm,
             )
           : null,
     );
