@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BoutiqueScore — diagnostic</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preload" href="test.wasm" as="fetch" crossorigin>
+</head>
+<body>
+  <main>
+    <div class="brand">BoutiqueScore</div>
+    <h1>Diagnostic de santé financière</h1>
+    <p class="lead">Quelques questions métier. Votre score d’abord — sans compte.</p>
+
+    <div id="boot" class="loading">Chargement du moteur…</div>
+
+    <div id="app" class="hidden">
+      <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+      <!-- ===== Phase A ===== -->
+      <section class="step active" data-step="country">
+        <h2>Quel est le pays ?</h2>
+        <label for="country">Pays</label>
+        <select id="country">
+          <option value="CM" selected>Cameroun</option>
+          <option value="SN">Sénégal</option>
+          <option value="CI">Côte d’Ivoire</option>
+          <option value="ML">Mali</option>
+          <option value="BF">Burkina Faso</option>
+          <option value="GN">Guinée</option>
+          <option value="CD">RDC</option>
+          <option value="GA">Gabon</option>
+          <option value="CG">Congo</option>
+          <option value="TG">Togo</option>
+          <option value="BJ">Bénin</option>
+        </select>
+        <div class="nav">
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="tenure">
+        <h2>Ancienneté du commerce au même emplacement ?</h2>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="tenure" value="UNDER_ONE_YEAR"> Moins de 1 an</label>
+          <label class="choice"><input type="radio" name="tenure" value="ONE_TO_THREE_YEARS" checked> Entre 1 et 3 ans</label>
+          <label class="choice"><input type="radio" name="tenure" value="OVER_THREE_YEARS"> Plus de 3 ans</label>
+        </div>
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="supplier">
+        <h2>Crédit fournisseur / confiance des grossistes ?</h2>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="supplier" value="CASH_ONLY"> Aucun crédit (comptant obligatoire)</label>
+          <label class="choice"><input type="radio" name="supplier" value="SHORT_TERM" checked> Crédit court terme (1 à 3 jours / fin de semaine)</label>
+          <label class="choice"><input type="radio" name="supplier" value="REGULAR_CONSIGNMENT"> Crédit régulier à tempérament / dépôt-vente</label>
+        </div>
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="cash">
+        <h2>Séparation des caisses maison / boutique ?</h2>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="cash" value="MIXED_HOUSEHOLD"> Je prends dans la caisse selon les besoins de la maison</label>
+          <label class="choice"><input type="radio" name="cash" value="FIXED_SALARY_OR_LOGGED" checked> Je me verse un montant/salaire fixe ou je note chaque retrait</label>
+          <label class="choice"><input type="radio" name="cash" value="FULLY_SEPARATED"> Les comptes de la maison et de la boutique sont 100% séparés</label>
+        </div>
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="customerCredit">
+        <h2>Suivi du crédit client ?</h2>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="customerCredit" value="MEMORY_ONLY"> De tête / sans note</label>
+          <label class="choice"><input type="radio" name="customerCredit" value="PAPER_NOTEBOOK" checked> Cahier papier unique</label>
+          <label class="choice"><input type="radio" name="customerCredit" value="DEDICATED_OR_APP"> Registre dédié ou Application / Excel</label>
+        </div>
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="restock">
+        <h2>Fréquence de réapprovisionnement ?</h2>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="restock" value="LESS_THAN_WEEKLY"> Moins d’une fois par semaine</label>
+          <label class="choice"><input type="radio" name="restock" value="ONE_TO_TWO_PER_WEEK" checked> 1 à 2 fois par semaine</label>
+          <label class="choice"><input type="radio" name="restock" value="MORE_THAN_TWICE_WEEKLY"> Plus de 2 fois par semaine / quotidien</label>
+        </div>
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" id="btnScore">Voir mon score</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="scoreReveal">
+        <h2>Votre score</h2>
+        <div class="score" id="scoreValue">—</div>
+        <p class="msg" id="scoreMsg"></p>
+        <div id="creditOffer" class="hidden">
+          <p class="msg">Votre profil peut intéresser une institution de microfinance. Souhaitez-vous poursuivre pour une mise en relation ?</p>
+          <div class="nav">
+            <button type="button" class="ghost" id="btnDeclineCredit">Non merci</button>
+            <button type="button" class="primary" id="btnAcceptCredit">Oui, continuer</button>
+          </div>
+        </div>
+        <div id="scoreSoftEnd" class="hidden">
+          <p class="msg">Vous pouvez renforcer votre score en utilisant une application de gestion</p>
+          <a class="cta" href="https://weebi.com" target="_blank" rel="noopener">Découvrir Weebi l'appli de gestion de boutique (gratuite)</a>
+        </div>
+      </section>
+
+      <!-- ===== Phase B (opt-in) ===== -->
+      <section class="step" data-step="city">
+        <h2>Quelle est la ville ?</h2>
+        <label for="city">Ville</label>
+        <input id="city" type="text" autocomplete="address-level2">
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="activity">
+        <h2>Quel type d’activité ?</h2>
+        <label for="activity">Activité</label>
+        <select id="activity"></select>
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="loanAmount">
+        <h2>De quel montant avez-vous besoin ?</h2>
+        <label for="loanAmount">Montant (<span id="loanCurrency">XAF</span>)</label>
+        <input id="loanAmount" type="text" inputmode="numeric" placeholder="ex. 250000" autocomplete="off">
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="registered">
+        <h2>Votre boutique est-elle enregistrée ?</h2>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="registered" value="no" checked> Non</label>
+          <label class="choice"><input type="radio" name="registered" value="yes"> Oui</label>
+        </div>
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="legal">
+        <h2>Sous quelle forme juridique ?</h2>
+        <label for="legalForm">Régime</label>
+        <select id="legalForm"></select>
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="rccm">
+        <h2>N° registre de commerce (RCCM) ?</h2>
+        <label for="rccm">Facultatif</label>
+        <input id="rccm" type="text" placeholder="RC/…">
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" data-next>Continuer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="phone">
+        <h2>Quel n° de téléphone ?</h2>
+        <div class="phone-field">
+          <span class="phone-prefix" id="dialHint" aria-hidden="true">+237</span>
+          <input id="phone" type="tel" inputmode="numeric" placeholder="6XX XX XX XX" autocomplete="tel-national">
+        </div>
+        <p class="hint" id="phoneCountryHint">Indicatif Cameroun</p>
+        <input class="honeypot" type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        <div id="error" class="hidden"></div>
+        <div class="nav">
+          <button type="button" class="ghost" data-prev>Retour</button>
+          <button type="button" class="primary" id="submitBtn">Envoyer</button>
+        </div>
+      </section>
+
+      <section class="step" data-step="thanks">
+        <h2>Merci</h2>
+        <p class="msg" id="thanksMsg">Nous avons bien reçu vos informations. Un partenaire pourra vous recontacter si pertinent.</p>
+        <a class="cta" href="https://weebi.com" target="_blank" rel="noopener">En attendant, découvrez Weebi</a>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    const boot = document.getElementById('boot');
+    const app = document.getElementById('app');
+
+    try {
+      if (location.protocol === 'file:') {
+        throw new Error(
+          'Ouvrez via un serveur HTTP (pas file://). Voir README : dhttpd depuis site/'
+        );
+      }
+      const dartModulePromise = WebAssembly.compileStreaming(fetch('test.wasm'));
+      const imports = {};
+      const dart2wasm_runtime = await import('./test.mjs');
+      const moduleInstance = await dart2wasm_runtime.instantiate(dartModulePromise, imports);
+      dart2wasm_runtime.invoke(moduleInstance);
+    } catch (e) {
+      console.error(e);
+      boot.textContent = 'Échec chargement moteur : ' + (e && e.message ? e.message : e);
+      boot.style.color = '#8b2e2e';
+      throw e;
+    }
+
+    const params = new URLSearchParams(location.search);
+    const campaignId = params.get('campaign_id') || '';
+    const mfiPartnerId = params.get('mfi_partner_id') || '';
+
+    boot.classList.add('hidden');
+    app.classList.remove('hidden');
+
+    const phaseA = ['country', 'tenure', 'supplier', 'cash', 'customerCredit', 'restock', 'scoreReveal'];
+    const phaseB = ['city', 'activity', 'loanAmount', 'registered', 'legal', 'rccm', 'phone', 'thanks'];
+    const flow = [...phaseA, ...phaseB];
+
+    let stepIndex = 0;
+    let lastScore = 0;
+    let creditOptIn = false;
+    const progressBar = document.getElementById('progressBar');
+
+    function isRegisteredYes() {
+      return document.querySelector('input[name="registered"]:checked').value === 'yes';
+    }
+
+    function inPhaseB() {
+      return stepIndex >= phaseA.length;
+    }
+
+    function nextIndex(from) {
+      let i = from + 1;
+      while (i < flow.length) {
+        const id = flow[i];
+        if ((id === 'legal' || id === 'rccm') && !isRegisteredYes()) { i += 1; continue; }
+        return i;
+      }
+      return flow.length - 1;
+    }
+
+    function prevIndex(from) {
+      let i = from - 1;
+      while (i >= 0) {
+        const id = flow[i];
+        if (id === 'scoreReveal') return i;
+        if ((id === 'legal' || id === 'rccm') && !isRegisteredYes()) { i -= 1; continue; }
+        return i;
+      }
+      return 0;
+    }
+
+    function showStep(i) {
+      stepIndex = i;
+      const id = flow[i];
+      document.querySelectorAll('.step').forEach((el) => {
+        el.classList.toggle('active', el.dataset.step === id);
+      });
+      const denom = inPhaseB() ? phaseB.length : phaseA.length;
+      const numer = inPhaseB() ? (i - phaseA.length + 1) : (i + 1);
+      progressBar.style.width = `${(Math.min(numer, denom) / denom) * 100}%`;
+      if (id === 'loanAmount' || id === 'phone') refreshCountryDependent();
+    }
+
+    function showSoftEndOnScore() {
+      document.getElementById('creditOffer').classList.add('hidden');
+      document.getElementById('scoreSoftEnd').classList.remove('hidden');
+    }
+
+    function q1q5Payload() {
+      return {
+        countryIso2: countryEl.value,
+        countryName: countryEl.options[countryEl.selectedIndex].text,
+        shopTenure: document.querySelector('input[name="tenure"]:checked').value,
+        supplierCredit: document.querySelector('input[name="supplier"]:checked').value,
+        cashSeparation: document.querySelector('input[name="cash"]:checked').value,
+        customerCreditTracking: document.querySelector('input[name="customerCredit"]:checked').value,
+        restockFrequency: document.querySelector('input[name="restock"]:checked').value,
+      };
+    }
+
+    const countryEl = document.getElementById('country');
+    const activityEl = document.getElementById('activity');
+    const legalEl = document.getElementById('legalForm');
+    const dialHint = document.getElementById('dialHint');
+    const loanCurrency = document.getElementById('loanCurrency');
+
+    function refreshCountryDependent() {
+      const iso = countryEl.value;
+      const countryName = countryEl.options[countryEl.selectedIndex].text;
+      const dial = boutiquescore.dialCode(iso) || 0;
+      const currency = boutiquescore.currencyForCountry(iso);
+      dialHint.textContent = dial ? '+' + dial : '—';
+      loanCurrency.textContent = currency;
+    }
+
+    activityEl.innerHTML = JSON.parse(boutiquescore.activitiesJson()).map(a =>
+      `<option value="${a.key}">${a.label}</option>`
+    ).join('');
+    legalEl.innerHTML = JSON.parse(boutiquescore.legalFormsJson()).map(f =>
+      `<option value="${f}">${f}</option>`
+    ).join('');
+
+    countryEl.addEventListener('change', refreshCountryDependent);
+    refreshCountryDependent();
+
+    document.querySelectorAll('[data-next]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (flow[stepIndex] === 'city' && !document.getElementById('city').value.trim()) {
+          document.getElementById('city').focus();
+          return;
+        }
+        if (flow[stepIndex] === 'loanAmount' && !document.getElementById('loanAmount').value.trim()) {
+          document.getElementById('loanAmount').focus();
+          return;
+        }
+        showStep(nextIndex(stepIndex));
+      });
+    });
+    document.querySelectorAll('[data-prev]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // From first B step, go back to score reveal
+        if (flow[stepIndex] === 'city') {
+          showStep(flow.indexOf('scoreReveal'));
+          return;
+        }
+        showStep(prevIndex(stepIndex));
+      });
+    });
+
+    document.getElementById('btnScore').addEventListener('click', () => {
+      const raw = boutiquescore.scoreOnly(JSON.stringify(q1q5Payload()));
+      const result = JSON.parse(raw);
+      lastScore = result.score;
+      document.getElementById('scoreValue').textContent = result.score;
+      document.getElementById('scoreMsg').textContent = result.message;
+      document.getElementById('creditOffer').classList.add('hidden');
+      document.getElementById('scoreSoftEnd').classList.add('hidden');
+      showStep(flow.indexOf('scoreReveal'));
+      if (result.eligibleForCreditOptIn) {
+        document.getElementById('creditOffer').classList.remove('hidden');
+      } else {
+        showSoftEndOnScore();
+      }
+    });
+
+    document.getElementById('btnDeclineCredit').addEventListener('click', () => {
+      creditOptIn = false;
+      showSoftEndOnScore();
+    });
+
+    document.getElementById('btnAcceptCredit').addEventListener('click', () => {
+      creditOptIn = true;
+      document.getElementById('creditOffer').classList.add('hidden');
+      showStep(flow.indexOf('city'));
+    });
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      const err = document.getElementById('error');
+      err.classList.add('hidden');
+      const countryOpt = countryEl.options[countryEl.selectedIndex];
+      const registered = isRegisteredYes();
+      const payload = {
+        ...q1q5Payload(),
+        countryName: countryOpt.text,
+        city: document.getElementById('city').value,
+        phoneNumber: document.getElementById('phone').value,
+        merchantName: '',
+        activityKey: activityEl.value,
+        wantsMfiLoan: true,
+        requestedLoanAmount: document.getElementById('loanAmount').value,
+        isRegistered: registered,
+        commercialRegisterNumber: registered ? document.getElementById('rccm').value : '',
+        legalFormCode: registered ? legalEl.value : '',
+        campaignId,
+        mfiPartnerId,
+        honeypot: document.getElementById('website').value,
+      };
+      const raw = boutiquescore.evaluate(JSON.stringify(payload));
+      const result = JSON.parse(raw);
+      if (result.error) {
+        err.textContent = result.error === 'missing_contact'
+          ? 'Indiquez un numéro de téléphone valide.'
+          : 'Soumission refusée.';
+        err.classList.remove('hidden');
+        return;
+      }
+      console.debug('submitPayload', result.payload);
+      document.getElementById('thanksMsg').textContent =
+        'Merci. Nous avons bien reçu vos informations. Un partenaire pourra vous recontacter si pertinent.';
+      showStep(flow.indexOf('thanks'));
+    });
+  </script>
+</body>
+</html>
