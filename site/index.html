@@ -178,7 +178,8 @@
       <section class="step" data-step="rccm">
         <h2>N° registre de commerce (RCCM) ?</h2>
         <label for="rccm">Facultatif</label>
-        <input id="rccm" type="text" placeholder="RC/…">
+        <input id="rccm" type="text" placeholder="RC/… ou CM-…" maxlength="40" autocomplete="off" spellcheck="false">
+        <div id="rccmError" class="field-error hidden"></div>
         <div class="nav">
           <button type="button" class="ghost" data-prev>Retour</button>
           <button type="button" class="primary" data-next>Continuer</button>
@@ -209,6 +210,12 @@
   </main>
 
   <script type="module">
+    import { submitEvaluationGrpcWeb } from './grpc_web_submit.mjs';
+
+    // Prod Envoy (Cloud Run) — public SubmitEvaluation (gRPC-Web). No API key in the browser.
+    const EVALUATION_SUBMIT_URL =
+      'https://weebi-envoyproxy-prd-29758828833.europe-west1.run.app/weebi.evaluation.service.EvaluationService/SubmitEvaluation';
+
     const boot = document.getElementById('boot');
     const app = document.getElementById('app');
 
@@ -329,6 +336,23 @@
     countryEl.addEventListener('change', refreshCountryDependent);
     refreshCountryDependent();
 
+    // Soft RCCM check (OHADA 2019 + legacy RC/…); empty is valid (optional).
+    // Mirrors RegExpWeebi.validateRccmOptional / rccmLoose.
+    const rccmLoose = /^[A-Za-z0-9/.\-]{8,40}$/;
+    function validateRccmOptional(raw) {
+      const value = (raw ?? '').trim();
+      if (!value) return null;
+      if (rccmLoose.test(value)) return null;
+      return 'N° RCCM invalide';
+    }
+
+    const rccmEl = document.getElementById('rccm');
+    const rccmError = document.getElementById('rccmError');
+    rccmEl.addEventListener('input', () => {
+      rccmError.classList.add('hidden');
+      rccmError.textContent = '';
+    });
+
     document.querySelectorAll('[data-next]').forEach(btn => {
       btn.addEventListener('click', () => {
         if (flow[stepIndex] === 'city' && !document.getElementById('city').value.trim()) {
@@ -338,6 +362,15 @@
         if (flow[stepIndex] === 'loanAmount' && !document.getElementById('loanAmount').value.trim()) {
           document.getElementById('loanAmount').focus();
           return;
+        }
+        if (flow[stepIndex] === 'rccm') {
+          const msg = validateRccmOptional(rccmEl.value);
+          if (msg) {
+            rccmError.textContent = msg;
+            rccmError.classList.remove('hidden');
+            rccmEl.focus();
+            return;
+          }
         }
         showStep(nextIndex(stepIndex));
       });
@@ -380,7 +413,7 @@
       showStep(flow.indexOf('city'));
     });
 
-    document.getElementById('submitBtn').addEventListener('click', () => {
+    document.getElementById('submitBtn').addEventListener('click', async () => {
       const err = document.getElementById('error');
       err.classList.add('hidden');
       const countryOpt = countryEl.options[countryEl.selectedIndex];
@@ -395,7 +428,7 @@
         wantsLoan: true,
         requestedLoanAmount: document.getElementById('loanAmount').value,
         isRegistered: registered,
-        commercialRegisterNumber: registered ? document.getElementById('rccm').value : '',
+        commercialRegisterNumber: registered ? rccmEl.value.trim() : '',
         legalForm: registered ? legalEl.value : '',
         campaignId,
         mfiPartnerId,
@@ -411,9 +444,19 @@
         return;
       }
       console.debug('submitPayload', result.payload);
-      document.getElementById('thanksMsg').textContent =
-        'Merci. Nous avons bien reçu vos informations. Un partenaire pourra vous recontacter si pertinent.';
+      const thanksEl = document.getElementById('thanksMsg');
+      thanksEl.textContent = 'Envoi en cours…';
       showStep(flow.indexOf('thanks'));
+
+      try {
+        await submitEvaluationGrpcWeb(EVALUATION_SUBMIT_URL, result.payload);
+        thanksEl.textContent =
+          'Merci. Nous avons bien reçu vos informations. Un partenaire pourra vous recontacter si pertinent.';
+      } catch (e) {
+        console.error('SubmitEvaluation failed', e);
+        thanksEl.textContent =
+          'Merci. Votre score est prêt ; l’envoi vers nos partenaires a échoué. Réessayez plus tard ou contactez Weebi.';
+      }
     });
   </script>
 </body>

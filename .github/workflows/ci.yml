@@ -1,0 +1,29 @@
+name: BoutiqueScore CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Analyze
+        run: dart analyze
+
+      - name: Run tests
+        run: dart test
+
+      # Ensure WASM still compiles (artifact not published here)
+      - name: Compile WASM
+        run: dart compile wasm web/main.dart -o site/test.wasm

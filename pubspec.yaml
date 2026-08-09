@@ -1,4 +1,4 @@
-name: wasm
+name: boutiquescore
 description: BoutiqueScore auto-évaluation web (Dart WASM).
 version: 1.0.0
 publish_to: none

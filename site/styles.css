@@ -205,7 +205,8 @@ button.ghost {
   line-height: 1.45;
 }
 
-#error {
+#error,
+.field-error {
   color: var(--danger);
   font-size: 0.9rem;
   margin-top: 0.5rem;

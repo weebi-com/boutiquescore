@@ -3,10 +3,11 @@
 .packages
 pubspec.lock
 
-# WASM / JS build artifacts (keep site/ sources only: index.html, styles.css)
+# WASM / JS build artifacts (keep hand-written site sources tracked)
 site/*.wasm
 site/*.wasm.map
 site/*.unopt.wasm
-site/*.mjs
+site/test.mjs
+site/test.support.js
 site/*.support.js
 site/main.dart.js

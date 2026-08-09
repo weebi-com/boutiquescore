@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:wasm/boutiquescore.dart';
+import 'package:boutiquescore/boutiquescore.dart';
 
 void main() {
   group('currency_resolver', () {

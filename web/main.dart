@@ -3,7 +3,7 @@ import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 
 import 'package:web/web.dart' as web;
-import 'package:wasm/boutiquescore.dart';
+import 'package:boutiquescore/boutiquescore.dart';
 
 /// JS-facing BoutiqueScore API for the HTML tunnel.
 class BoutiqueScoreApi {
