@@ -2,7 +2,7 @@
  * Writes a sample SubmitEvaluationRequest protobuf (no gRPC-Web frame) to stdout as binary.
  * Usage: node encode_sample_request.mjs > sample_submit.pb
  */
-import { writeFileSync } from 'node:fs';
+import { writeFileSync } from 'fs';
 import { encodeSubmitEvaluationRequest } from '../site/grpc_web_submit.mjs';
 
 const payload = {

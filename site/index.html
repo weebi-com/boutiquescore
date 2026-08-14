@@ -211,6 +211,7 @@
 
   <script type="module">
     import { submitEvaluationGrpcWeb } from './grpc_web_submit.mjs';
+    import * as dart2wasm from './test.mjs';
 
     // Prod Envoy (Cloud Run) — public SubmitEvaluation (gRPC-Web). No API key in the browser.
     const EVALUATION_SUBMIT_URL =
@@ -225,11 +226,9 @@
           'Ouvrez via un serveur HTTP (pas file://). Voir README : dhttpd depuis site/'
         );
       }
-      const dartModulePromise = WebAssembly.compileStreaming(fetch('test.wasm'));
-      const imports = {};
-      const dart2wasm_runtime = await import('./test.mjs');
-      const moduleInstance = await dart2wasm_runtime.instantiate(dartModulePromise, imports);
-      dart2wasm_runtime.invoke(moduleInstance);
+      const compiledApp = await dart2wasm.compileStreaming(fetch('test.wasm'));
+      const instance = await compiledApp.instantiate({});
+      instance.invokeMain();
     } catch (e) {
       console.error(e);
       boot.textContent = 'Échec chargement moteur : ' + (e && e.message ? e.message : e);
