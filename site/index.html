@@ -10,8 +10,8 @@
 <body>
   <main>
     <div class="brand">BoutiqueScore</div>
-    <h1>Diagnostic de santé financière</h1>
-    <p class="lead">Quelques questions métier. Votre score d’abord — sans compte.</p>
+    <h1>Auto-évaluation de l'éligibilité de votre boutique à un crédit</h1>
+    <p class="lead">En quelques questions vous obtiendrez votre score — pas de création de compte.</p>
 
     <div id="boot" class="loading">Chargement du moteur…</div>
 
@@ -194,6 +194,18 @@
         </div>
         <p class="hint" id="phoneCountryHint">Indicatif Cameroun</p>
         <input class="honeypot" type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        <label class="consent" for="shareConsent">
+          <input type="checkbox" id="shareConsent" name="shareConsent">
+          <span>J’accepte de partager ces informations avec Boutiques Broker.</span>
+        </label>
+        <aside class="legal" aria-label="Mentions légales">
+          <strong>Mentions légales</strong>
+          <address>
+            Boutiques Broker OÜ<br>
+            Harju County, Tallinn, Lasnamäe District, Ruunaoja Street 3, 11415, Estonie<br>
+            n° registre: 17421651
+          </address>
+        </aside>
         <div id="error" class="hidden"></div>
         <div class="nav">
           <button type="button" class="ghost" data-prev>Retour</button>
@@ -415,6 +427,12 @@
     document.getElementById('submitBtn').addEventListener('click', async () => {
       const err = document.getElementById('error');
       err.classList.add('hidden');
+      if (!document.getElementById('shareConsent').checked) {
+        err.textContent = 'Veuillez accepter le partage de vos informations avec Boutiques Broker.';
+        err.classList.remove('hidden');
+        document.getElementById('shareConsent').focus();
+        return;
+      }
       const countryOpt = countryEl.options[countryEl.selectedIndex];
       const registered = isRegisteredYes();
       const payload = {
