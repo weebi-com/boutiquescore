@@ -20,7 +20,7 @@
 
       <!-- ===== Phase A ===== -->
       <section class="step active" data-step="country">
-        <h2>Quel est le pays ?</h2>
+        <h2>Dans quel pays se situe votre activité ?</h2>
         <label for="country">Pays</label>
         <select id="country">
           <option value="CM" selected>Cameroun</option>
@@ -41,7 +41,7 @@
       </section>
 
       <section class="step" data-step="tenure">
-        <h2>Ancienneté du commerce au même emplacement ?</h2>
+        <h2>Depuis combien de temps exercez-vous cette activité au même emplacement ?</h2>
         <div class="choices">
           <label class="choice"><input type="radio" name="tenure" value="UNDER_ONE_YEAR"> Moins de 1 an</label>
           <label class="choice"><input type="radio" name="tenure" value="ONE_TO_THREE_YEARS" checked> Entre 1 et 3 ans</label>
@@ -54,7 +54,7 @@
       </section>
 
       <section class="step" data-step="supplier">
-        <h2>Crédit fournisseur / confiance des grossistes ?</h2>
+        <h2>Vos fournisseurs vous accordent-ils un crédit ?</h2>
         <div class="choices">
           <label class="choice"><input type="radio" name="supplier" value="CASH_ONLY"> Aucun crédit (comptant obligatoire)</label>
           <label class="choice"><input type="radio" name="supplier" value="SHORT_TERM" checked> Crédit court terme (1 à 3 jours / fin de semaine)</label>
@@ -67,7 +67,7 @@
       </section>
 
       <section class="step" data-step="cash">
-        <h2>Séparation des caisses maison / boutique ?</h2>
+        <h2>Faites-vous la distinction entre la caisse de la boutique et vos finances personnelles ?</h2>
         <div class="choices">
           <label class="choice"><input type="radio" name="cash" value="MIXED_HOUSEHOLD"> Je prends dans la caisse selon les besoins de la maison</label>
           <label class="choice"><input type="radio" name="cash" value="FIXED_SALARY_OR_LOGGED" checked> Je me verse un montant/salaire fixe ou je note chaque retrait</label>
@@ -80,7 +80,7 @@
       </section>
 
       <section class="step" data-step="customerCredit">
-        <h2>Suivi du crédit client ?</h2>
+        <h2>Comment suivez-vous les crédits clients ?</h2>
         <div class="choices">
           <label class="choice"><input type="radio" name="customerCredit" value="MEMORY_ONLY"> De tête / sans note</label>
           <label class="choice"><input type="radio" name="customerCredit" value="PAPER_NOTEBOOK" checked> Cahier papier unique</label>
@@ -93,7 +93,7 @@
       </section>
 
       <section class="step" data-step="restock">
-        <h2>Fréquence de réapprovisionnement ?</h2>
+        <h2>À quelle fréquence réapprovisionnez-vous votre stock ?</h2>
         <div class="choices">
           <label class="choice"><input type="radio" name="restock" value="LESS_THAN_WEEKLY"> Moins d’une fois par semaine</label>
           <label class="choice"><input type="radio" name="restock" value="ONE_TO_TWO_PER_WEEK" checked> 1 à 2 fois par semaine</label>
@@ -124,7 +124,7 @@
 
       <!-- ===== Phase B (opt-in) ===== -->
       <section class="step" data-step="city">
-        <h2>Quelle est la ville ?</h2>
+        <h2>Dans quelle ville se situe votre activité ?</h2>
         <label for="city">Ville</label>
         <input id="city" type="text" autocomplete="address-level2">
         <div class="nav">
@@ -134,7 +134,7 @@
       </section>
 
       <section class="step" data-step="activity">
-        <h2>Quel type d’activité ?</h2>
+        <h2>Quel type de commerce exercez-vous ?</h2>
         <label for="activity">Activité</label>
         <select id="activity"></select>
         <div class="nav">
@@ -144,7 +144,7 @@
       </section>
 
       <section class="step" data-step="loanAmount">
-        <h2>De quel montant avez-vous besoin ?</h2>
+        <h2>De quel montant avez-vous besoin pour développer votre activité ?</h2>
         <label for="loanAmount">Montant (<span id="loanCurrency">XAF</span>)</label>
         <input id="loanAmount" type="text" inputmode="numeric" placeholder="ex. 250000" autocomplete="off">
         <div class="nav">
@@ -154,7 +154,7 @@
       </section>
 
       <section class="step" data-step="registered">
-        <h2>Votre boutique est-elle enregistrée ?</h2>
+        <h2>Est-ce que votre activité est enregistrée au registre de commerce ?</h2>
         <div class="choices">
           <label class="choice"><input type="radio" name="registered" value="no" checked> Non</label>
           <label class="choice"><input type="radio" name="registered" value="yes"> Oui</label>
@@ -187,7 +187,7 @@
       </section>
 
       <section class="step" data-step="phone">
-        <h2>Quel n° de téléphone ?</h2>
+        <h2>Quel est votre numéro de téléphone ?</h2>
         <div class="phone-field">
           <span class="phone-prefix" id="dialHint" aria-hidden="true">+237</span>
           <input id="phone" type="tel" inputmode="numeric" placeholder="6XX XX XX XX" autocomplete="tel-national">
@@ -203,8 +203,8 @@
 
       <section class="step" data-step="thanks">
         <h2>Merci</h2>
-        <p class="msg" id="thanksMsg">Nous avons bien reçu vos informations. Un partenaire pourra vous recontacter si pertinent.</p>
-        <a class="cta" href="https://weebi.com" target="_blank" rel="noopener">En attendant, découvrez Weebi</a>
+        <p class="msg" id="thanksMsg">Nous avons bien reçu vos informations. Un partenaire vous recontactera si votre dossier est retenu.</p>
+        <a class="cta" href="https://weebi.com" target="_blank" rel="noopener">En attendant, découvrez Weebi, l'appli de gestion de boutique (gratuite)</a>
       </section>
     </div>
   </main>
